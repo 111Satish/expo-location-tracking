@@ -3,6 +3,7 @@ import CoreLocation
 
 public class LocationTrackingModule: Module, CLLocationManagerDelegate {
   private let locationManager = CLLocationManager()
+  private var hasListeners = false
 
   public func definition() -> ModuleDefinition {
     Name("LocationTracking")
@@ -12,7 +13,10 @@ public class LocationTrackingModule: Module, CLLocationManagerDelegate {
       locationManager.requestAlwaysAuthorization()
       locationManager.allowsBackgroundLocationUpdates = true
       locationManager.pausesLocationUpdatesAutomatically = false
+      locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
     }
+
+    Events("onLocationUpdate", "onLocationError")
 
     Function("startTracking") {
       locationManager.startUpdatingLocation()
@@ -30,30 +34,37 @@ public class LocationTrackingModule: Module, CLLocationManagerDelegate {
     Function("stopSignificantTracking") {
       locationManager.stopMonitoringSignificantLocationChanges()
     }
-  }
 
-  public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-    // Here you can send the location to your server or store it locally
-  }
+    OnStartObserving {
+      hasListeners = true
+    }
 
-  public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-    switch manager.authorizationStatus {
-    case .authorizedAlways:
-      print("Location authorization: Always")
-    case .authorizedWhenInUse:
-      print("Location authorization: When In Use")
-    case .denied:
-      print("Location authorization: Denied")
-    case .notDetermined:
-      print("Location authorization: Not Determined")
-    case .restricted:
-      print("Location authorization: Restricted")
-    @unknown default:
-      print("Location authorization: Unknown")
+    OnStopObserving {
+      hasListeners = false
     }
   }
 
+  public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    guard hasListeners else { return }
+    guard let location = locations.last else { return }
+
+    sendEvent("onLocationUpdate", [
+      "latitude": location.coordinate.latitude,
+      "longitude": location.coordinate.longitude,
+      "altitude": location.altitude,
+      "accuracy": location.horizontalAccuracy,
+      "speed": location.speed,
+      "timestamp": location.timestamp.timeIntervalSince1970 * 1000 // Convert to milliseconds
+    ])
+  }
+
+  public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+    // Handle authorization status changes if needed
+    // You might want to send an event to JS about the status change
+  }
+
   public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-    print("Location manager failed with error: \(error.localizedDescription)")
+    guard hasListeners else { return }
+    sendEvent("onLocationError", ["message": error.localizedDescription])
   }
 }
