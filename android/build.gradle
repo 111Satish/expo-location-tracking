@@ -1,6 +1,10 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+ext {
+    kotlin_version = '1.8.0'
+}
+
 android {
     compileSdkVersion 33
     defaultConfig {
