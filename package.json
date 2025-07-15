@@ -1,0 +1,40 @@
+{
+  "name": "expo-location-tracking",
+  "version": "1.0.0",
+  "description": "An Expo package for background location tracking",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "expo-module build",
+    "clean": "expo-module clean",
+    "test": "expo-module test",
+    "prepublishOnly": "expo-module prepublishOnly",
+    "expo-module": "expo-module"
+  },
+  "keywords": [
+    "react-native",
+    "expo",
+    "location",
+    "tracking",
+    "background"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/111satish/expo-location-tracking"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "expo-module-scripts": "^3.0.0",
+    "expo-modules-core": "^1.5.7"
+  },
+  "peerDependencies": {
+    "expo": "*",
+    "react": "*",
+    "react-native": "*"
+  },
+  "expo-module": {
+    "plugin": "build/plugin/index.js"
+  }
+}
