@@ -26,21 +26,18 @@
   },
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "react-native": "0.76.9"
+  },
   "devDependencies": {
     "cross-env": "^7.0.3",
     "expo-module-scripts": "^3.0.0",
     "expo-modules-core": "^2.4.2"
   },
   "peerDependencies": {
-    "react": "*",
-    "react-native": "*"
+    "react": "*"
   },
   "expo-module": {
     "plugin": "build/plugin/index.js"
-  },
-  "dependencies": {
-    "expo": "^53.0.19",
-    "react": "*",
-    "react-native": "*"
   }
 }
