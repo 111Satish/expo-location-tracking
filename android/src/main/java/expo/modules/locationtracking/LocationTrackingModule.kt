@@ -1,49 +1,41 @@
 package expo.modules.locationtracking
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
+import android.content.Context
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.kotlin.exception.Exceptions
 
 class LocationTrackingModule : Module() {
-    override fun definition() = ModuleDefinition {
-        Name("LocationTracking")
+  private val context: Context
+    get() = appContext.reactContext ?: throw Exceptions.ReactContextLost()
 
-        // Events that can be sent from the native module to JavaScript
-        Events("onLocationUpdate", "onLocationError")
+  override fun definition() = ModuleDefinition {
+    Name("LocationTracking")
 
-        Function("startTracking") {
-            val context = appContext.reactContext ?: throw IllegalStateException("React ApplicationContext is null")
+    Events("onLocationUpdate", "onLocationError")
 
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                throw SecurityException("Location permissions not granted. Please ensure ACCESS_FINE_LOCATION or ACCESS_COARSE_LOCATION are granted.")
-            }
-
-            // Start the LocationTrackingService
-            val intent = Intent(context, LocationTrackingService::class.java)
-            context.startService(intent)
-        }
-
-        Function("stopTracking") {
-            val context = appContext.reactContext ?: throw IllegalStateException("React ApplicationContext is null")
-            // Stop the LocationTrackingService
-            val intent = Intent(context, LocationTrackingService::class.java)
-            context.stopService(intent)
-        }
-
-        // You might not need separate functions for significant tracking if your service handles both
-        // or if significant tracking is a configuration option for startTracking.
-        // For now, I'll keep them as placeholders or remove if not explicitly needed.
-        Function("startSignificantTracking") {
-            // Implement start significant tracking logic here
-            // This might involve configuring the LocationTrackingService differently
-        }
-
-        Function("stopSignificantTracking") {
-            // Implement stop significant tracking logic here
-        }
+    Function("startTracking") {
+      val intent = Intent(context, LocationTrackingService::class.java)
+      context.startService(intent)
     }
+
+    Function("stopTracking") {
+      val intent = Intent(context, LocationTrackingService::class.java)
+      context.stopService(intent)
+    }
+
+    // For parity with iOS, but these will just call the regular tracking on Android
+    // as Android doesn't have a direct equivalent to "significant location changes" API
+    // that relaunches the app in the same way. The foreground service is the robust way.
+    Function("startSignificantTracking") {
+      val intent = Intent(context, LocationTrackingService::class.java)
+      context.startService(intent)
+    }
+
+    Function("stopSignificantTracking") {
+      val intent = Intent(context, LocationTrackingService::class.java)
+      context.stopService(intent)
+    }
+  }
 }

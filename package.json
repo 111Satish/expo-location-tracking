@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "build": "expo-module build",
+    "build": "node scripts/build.js",
     "clean": "expo-module clean",
     "test": "expo-module test",
     "prepublishOnly": "expo-module prepublishOnly",
@@ -27,7 +27,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "react-native": "0.76.9"
+    "react-native": "0.80.1"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
